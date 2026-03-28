@@ -1,24 +1,24 @@
 {
-  "name": "zotero-plugin-template",
+  "name": "zotero-tag-recommender",
   "type": "module",
-  "version": "3.1.0",
-  "description": "Zotero Plugin Template",
+  "version": "1.0.0",
+  "description": "Zotero Tag Recommender - AI-powered tag suggestions for your papers",
   "config": {
-    "addonName": "Zotero Plugin Template",
-    "addonID": "addontemplate@euclpts.com",
-    "addonRef": "addontemplate",
-    "addonInstance": "AddonTemplate",
-    "prefsPrefix": "extensions.zotero.addontemplate"
+    "addonName": "Zotero Tag Recommender",
+    "addonID": "tagrecommender@zotero.org",
+    "addonRef": "tagrecommender",
+    "addonInstance": "TagRecommender",
+    "prefsPrefix": "extensions.zotero.tagrecommender"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windingwind/zotero-plugin-template.git"
+    "url": "git+https://github.com/yourusername/zotero-tag-recommender.git"
   },
-  "author": "windingwind",
+  "author": "Your Name",
   "bugs": {
-    "url": "https://github.com/windingwind/zotero-plugin-template/issues"
+    "url": "https://github.com/yourusername/zotero-tag-recommender/issues"
   },
-  "homepage": "https://github.com/windingwind/zotero-plugin-template#readme",
+  "homepage": "https://github.com/yourusername/zotero-tag-recommender#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",

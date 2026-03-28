@@ -1,0 +1,209 @@
+import { config } from "../../package.json";
+
+export class TagRecommenderFactory {
+  /**
+   * Get all existing tags in the library
+   */
+  static async getExistingTags(): Promise<string[]> {
+    const libraryID = Zotero.Libraries.userLibraryID;
+    const tags = await Zotero.Tags.getAll(libraryID);
+    return tags.map((tag) => tag.tag);
+  }
+
+  /**
+   * Get title and abstract for an item
+   */
+  static getItemMetadata(item: Zotero.Item): {
+    title: string;
+    abstract: string;
+    creators: string;
+  } {
+    const title = item.getField("title") as string || "";
+    const abstract = item.getField("abstractNote") as string || "";
+    const creators = item.getCreators()
+      .map((c) => `${c.firstName || ""} ${c.lastName || ""}`.trim())
+      .join(", ");
+    
+    return { title, abstract, creators };
+  }
+
+  /**
+   * Call LLM API to get tag suggestions
+   */
+  static async getSuggestedTags(
+    title: string,
+    abstract: string,
+    existingTags: string[],
+  ): Promise<string[]> {
+    const apiKey = Zotero.Prefs.get(
+      `${config.prefsPrefix}.apiKey`,
+      true,
+    ) as string;
+    const apiProvider = Zotero.Prefs.get(
+      `${config.prefsPrefix}.apiProvider`,
+      true,
+    ) as string;
+    const apiModel = Zotero.Prefs.get(
+      `${config.prefsPrefix}.apiModel`,
+      true,
+    ) as string;
+    const customPrompt = Zotero.Prefs.get(
+      `${config.prefsPrefix}.customPrompt`,
+      true,
+    ) as string;
+    const maxTags = Zotero.Prefs.get(
+      `${config.prefsPrefix}.maxTags`,
+      true,
+    ) as number;
+
+    ztoolkit.log("Tag Recommender - Starting tag generation");
+    ztoolkit.log("Provider:", apiProvider);
+    ztoolkit.log("Model:", apiModel);
+    ztoolkit.log("Max tags:", maxTags);
+
+    if (!apiKey || apiKey.trim() === "") {
+      throw new Error("API key not configured. Please set it in preferences.");
+    }
+
+    // Build the prompt
+    const tagsString = existingTags.slice(0, 100).join(", ");
+    const prompt = customPrompt
+      .replace("{title}", title)
+      .replace("{abstract}", abstract || "No abstract available")
+      .replace("{tags}", tagsString || "No existing tags");
+
+    ztoolkit.log("Generated prompt:", prompt.substring(0, 200) + "...");
+
+    let suggestions: string[] = [];
+
+    try {
+      if (apiProvider === "openai") {
+        suggestions = await this.callOpenAI(apiKey, prompt, maxTags, apiModel);
+      } else if (apiProvider === "anthropic") {
+        suggestions = await this.callAnthropic(apiKey, prompt, maxTags, apiModel);
+      } else {
+        throw new Error(`Unsupported API provider: ${apiProvider}`);
+      }
+
+      ztoolkit.log("Received suggestions:", suggestions);
+    } catch (error: any) {
+      ztoolkit.log("Error calling API:", error);
+      throw error;
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Call OpenAI API
+   */
+  private static async callOpenAI(
+    apiKey: string,
+    prompt: string,
+    maxTags: number,
+    model: string,
+  ): Promise<string[]> {
+    ztoolkit.log("Calling OpenAI with model:", model);
+    
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: model || "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 150,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      ztoolkit.log("OpenAI API error response:", error);
+      throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    ztoolkit.log("OpenAI API response:", data);
+    const content = (data as any).choices?.[0]?.message?.content || "";
+    return this.parseTags(content, maxTags);
+  }
+
+  /**
+   * Call Anthropic API
+   */
+  private static async callAnthropic(
+    apiKey: string,
+    prompt: string,
+    maxTags: number,
+    model: string,
+  ): Promise<string[]> {
+    ztoolkit.log("Calling Anthropic with model:", model);
+    
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: model || "claude-3-haiku-20240307",
+        max_tokens: 150,
+        messages: [
+          {
+            role: "user",
+            content:
+              "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.\n\n" +
+              prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      ztoolkit.log("Anthropic API error response:", error);
+      throw new Error(`Anthropic API error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    ztoolkit.log("Anthropic API response:", data);
+    const content = (data as any).content?.[0]?.text || "";
+    return this.parseTags(content, maxTags);
+  }
+
+  /**
+   * Parse tags from LLM response
+   */
+  private static parseTags(content: string, maxTags: number): string[] {
+    const tags = content
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0 && tag.length < 100)
+      .slice(0, maxTags);
+    return tags;
+  }
+
+  /**
+   * Apply selected tags to an item
+   */
+  static async applyTags(item: Zotero.Item, tags: string[]): Promise<void> {
+    for (const tag of tags) {
+      item.addTag(tag);
+    }
+    await item.saveTx();
+  }
+}

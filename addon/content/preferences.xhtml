@@ -5,25 +5,90 @@
   onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window })"
 >
   <label><html:h2 data-l10n-id="pref-title"></html:h2></label>
-  <checkbox
-    id="zotero-prefpane-__addonRef__-enable"
-    preference="enable"
-    data-l10n-id="pref-enable"
-  />
-  <hbox>
+  
+  <label><html:h3 data-l10n-id="pref-api-settings"></html:h3></label>
+  
+  <hbox align="center">
     <html:label
-      for="zotero-prefpane-__addonRef__-input"
-      data-l10n-id="pref-input"
+      for="zotero-prefpane-__addonRef__-apiProvider"
+      data-l10n-id="pref-api-provider"
+    ></html:label>
+    <menulist
+      id="zotero-prefpane-__addonRef__-apiProvider"
+      preference="apiProvider"
+    >
+      <menupopup>
+        <menuitem label="OpenAI" value="openai" />
+        <menuitem label="Anthropic (Claude)" value="anthropic" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  
+  <hbox align="center">
+    <html:label
+      for="zotero-prefpane-__addonRef__-apiModel"
+      data-l10n-id="pref-api-model"
+    ></html:label>
+    <menulist
+      id="zotero-prefpane-__addonRef__-apiModel"
+      preference="apiModel"
+    >
+      <menupopup>
+        <menuitem label="GPT-3.5 Turbo (OpenAI)" value="gpt-3.5-turbo" />
+        <menuitem label="GPT-4 Turbo (OpenAI)" value="gpt-4-turbo-preview" />
+        <menuitem label="GPT-4 (OpenAI)" value="gpt-4" />
+        <menuitem label="Claude 3 Haiku (Anthropic)" value="claude-3-haiku-20240307" />
+        <menuitem label="Claude 3 Sonnet (Anthropic)" value="claude-3-sonnet-20240229" />
+        <menuitem label="Claude 3 Opus (Anthropic)" value="claude-3-opus-20240229" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  
+  <hbox align="center">
+    <html:label
+      for="zotero-prefpane-__addonRef__-apiKey"
+      data-l10n-id="pref-api-key"
     ></html:label>
     <html:input
-      type="text"
-      id="zotero-prefpane-__addonRef__-input"
-      preference="input"
+      type="password"
+      id="zotero-prefpane-__addonRef__-apiKey"
+      preference="apiKey"
+      style="flex: 1;"
     ></html:input>
   </hbox>
-  <hbox class="virtualized-table-container" flex="1" height="300px">
-    <html:div id="__addonRef__-table-container" />
+  
+  <label><html:h3 data-l10n-id="pref-prompt-settings"></html:h3></label>
+  
+  <hbox align="center">
+    <html:label
+      for="zotero-prefpane-__addonRef__-maxTags"
+      data-l10n-id="pref-max-tags"
+    ></html:label>
+    <html:input
+      type="number"
+      id="zotero-prefpane-__addonRef__-maxTags"
+      preference="maxTags"
+      min="1"
+      max="20"
+      style="width: 60px;"
+    ></html:input>
   </hbox>
+  
+  <vbox>
+    <html:label
+      for="zotero-prefpane-__addonRef__-customPrompt"
+      data-l10n-id="pref-custom-prompt"
+    ></html:label>
+    <html:textarea
+      id="zotero-prefpane-__addonRef__-customPrompt"
+      preference="customPrompt"
+      rows="8"
+      style="width: 100%;"
+    ></html:textarea>
+    <html:div style="font-size: 0.9em; color: #666; margin-top: 4px;">
+      <html:span data-l10n-id="pref-prompt-help"></html:span>
+    </html:div>
+  </vbox>
 </groupbox>
 <vbox>
   <html:label

@@ -1,0 +1,17 @@
+dialog-no-items-selected = 未选择项目。请先选择一个项目。
+dialog-multiple-items-warning = 选择了多个项目。仅处理第一个项目。
+dialog-generating-tags = 正在生成标签建议...
+dialog-fetching-existing-tags = 正在从库中获取现有标签...
+dialog-calling-api = 正在调用 AI API...
+dialog-error = 错误
+dialog-title = 推荐的标签
+dialog-description = 选择要应用的标签，或在下方添加自定义标签。
+dialog-manual-input = 添加自定义标签
+dialog-add-custom-tag = 自定义标签
+dialog-tag-placeholder = 输入以逗号分隔的标签
+dialog-apply-button = 应用标签
+dialog-cancel-button = 取消
+dialog-window-title = AI 标签建议
+dialog-no-suggestions = 未生成标签建议。请尝试手动添加自定义标签。
+dialog-no-tags-selected = 未选择标签。请至少选择一个标签或添加自定义标签。
+dialog-tags-applied = 已成功应用 {$count} 个标签到项目。

@@ -1,5 +1,10 @@
-pref-title = 插件模板设置示例
-pref-enable =
-    .label = 开启
-pref-input = 输入
+pref-title = 标签推荐器设置
+pref-api-settings = API 配置
+pref-api-provider = API 提供商:
+pref-api-model = 模型:
+pref-api-key = API 密钥:
+pref-prompt-settings = 标签生成设置
+pref-max-tags = 最大标签数:
+pref-custom-prompt = 自定义提示模板:
+pref-prompt-help = 在提示中使用 {title}, {abstract}, 和 {tags} 作为占位符。
 pref-help = { $name } Build { $version } { $time }

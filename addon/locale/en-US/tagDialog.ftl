@@ -1,0 +1,17 @@
+dialog-no-items-selected = No items selected. Please select an item first.
+dialog-multiple-items-warning = Multiple items selected. Processing first item only.
+dialog-generating-tags = Generating tag suggestions...
+dialog-fetching-existing-tags = Fetching existing tags from library...
+dialog-calling-api = Calling AI API...
+dialog-error = Error
+dialog-title = Suggested Tags
+dialog-description = Select the tags you want to apply, or add your own custom tags below.
+dialog-manual-input = Add Custom Tags
+dialog-add-custom-tag = Custom tags
+dialog-tag-placeholder = Enter tags separated by commas
+dialog-apply-button = Apply Tags
+dialog-cancel-button = Cancel
+dialog-window-title = AI Tag Suggestions
+dialog-no-suggestions = No tag suggestions generated. Try adding a custom tag manually.
+dialog-no-tags-selected = No tags selected. Please select at least one tag or add a custom tag.
+dialog-tags-applied = Successfully applied {$count} tag(s) to the item.
