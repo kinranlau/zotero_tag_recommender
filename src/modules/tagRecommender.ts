@@ -39,12 +39,13 @@ export class TagRecommenderFactory {
     abstract: string;
     creators: string;
   } {
-    const title = item.getField("title") as string || "";
-    const abstract = item.getField("abstractNote") as string || "";
-    const creators = item.getCreators()
+    const title = (item.getField("title") as string) || "";
+    const abstract = (item.getField("abstractNote") as string) || "";
+    const creators = item
+      .getCreators()
       .map((c) => `${c.firstName || ""} ${c.lastName || ""}`.trim())
       .join(", ");
-    
+
     return { title, abstract, creators };
   }
 
@@ -102,7 +103,12 @@ export class TagRecommenderFactory {
       if (apiProvider === "openai") {
         suggestions = await this.callOpenAI(apiKey, prompt, maxTags, apiModel);
       } else if (apiProvider === "anthropic") {
-        suggestions = await this.callAnthropic(apiKey, prompt, maxTags, apiModel);
+        suggestions = await this.callAnthropic(
+          apiKey,
+          prompt,
+          maxTags,
+          apiModel,
+        );
       } else {
         throw new Error(`Unsupported API provider: ${apiProvider}`);
       }
@@ -129,7 +135,9 @@ export class TagRecommenderFactory {
 
     let resolvedModel = model || "gpt-4o-mini";
     if (resolvedModel.startsWith("gpt-5")) {
-      ztoolkit.log("gpt-5 model not supported in this plugin flow, falling back to gpt-4o-mini");
+      ztoolkit.log(
+        "gpt-5 model not supported in this plugin flow, falling back to gpt-4o-mini",
+      );
       resolvedModel = "gpt-4o-mini";
     }
     const requestBody: any = {

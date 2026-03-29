@@ -12,7 +12,7 @@ export class TagDialogFactory {
       return;
     }
     const items = win.ZoteroPane.getSelectedItems();
-    
+
     if (!items || items.length === 0) {
       new ztoolkit.ProgressWindow(config.addonName)
         .createLine({
@@ -33,7 +33,7 @@ export class TagDialogFactory {
     }
 
     const item = items[0];
-    
+
     // Show progress
     const progressWin = new ztoolkit.ProgressWindow(config.addonName, {
       closeOnClick: false,
@@ -48,7 +48,7 @@ export class TagDialogFactory {
     try {
       // Get item metadata
       const { title, abstract } = TagRecommenderFactory.getItemMetadata(item);
-      
+
       progressWin.changeLine({
         text: getString("dialog-fetching-existing-tags"),
         progress: 30,
@@ -56,7 +56,7 @@ export class TagDialogFactory {
 
       // Get existing tags
       const existingTags = await TagRecommenderFactory.getExistingTags();
-      
+
       progressWin.changeLine({
         text: getString("dialog-calling-api"),
         progress: 50,
@@ -156,7 +156,8 @@ export class TagDialogFactory {
         tag: "div",
         namespace: "html",
         attributes: {
-          style: "padding: 20px; width: 540px; max-height: 420px; overflow-y: auto; overflow-x: hidden; box-sizing: border-box;",
+          style:
+            "padding: 20px; width: 540px; max-height: 420px; overflow-y: auto; overflow-x: hidden; box-sizing: border-box;",
         },
         children: [
           {
@@ -182,31 +183,39 @@ export class TagDialogFactory {
                 namespace: "html",
                 id: "suggested-tags-container",
                 attributes: {
-                  style: "display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--material-background, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; max-height: 200px; overflow-y: auto;",
+                  style:
+                    "display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--material-background, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; max-height: 200px; overflow-y: auto;",
                 },
-                children: suggestedTags.length > 0 ? suggestedTags.map((tag, index) => ({
-                  tag: "button",
-                  namespace: "html",
-                  id: `tag-btn-${index}`,
-                  attributes: {
-                    type: "button",
-                    "data-tag": tag,
-                    "data-selected": "false",
-                    style: "padding: 6px 14px; border-radius: 16px; border: 1px solid #0066cc; background: rgba(0, 102, 204, 0.15); color: var(--fill-primary, #fff); cursor: pointer; font-size: 13px; transition: all 0.15s ease;",
-                  },
-                  properties: {
-                    textContent: tag,
-                  },
-                })) : [{
-                  tag: "div",
-                  namespace: "html",
-                  attributes: {
-                    style: "padding: 20px; text-align: center; font-style: italic; color: var(--fill-secondary, #888); width: 100%;",
-                  },
-                  properties: {
-                    textContent: getString("dialog-no-suggestions"),
-                  },
-                }],
+                children:
+                  suggestedTags.length > 0
+                    ? suggestedTags.map((tag, index) => ({
+                        tag: "button",
+                        namespace: "html",
+                        id: `tag-btn-${index}`,
+                        attributes: {
+                          type: "button",
+                          "data-tag": tag,
+                          "data-selected": "false",
+                          style:
+                            "padding: 6px 14px; border-radius: 16px; border: 1px solid #0066cc; background: rgba(0, 102, 204, 0.15); color: var(--fill-primary, #fff); cursor: pointer; font-size: 13px; transition: all 0.15s ease;",
+                        },
+                        properties: {
+                          textContent: tag,
+                        },
+                      }))
+                    : [
+                        {
+                          tag: "div",
+                          namespace: "html",
+                          attributes: {
+                            style:
+                              "padding: 20px; text-align: center; font-style: italic; color: var(--fill-secondary, #888); width: 100%;",
+                          },
+                          properties: {
+                            textContent: getString("dialog-no-suggestions"),
+                          },
+                        },
+                      ],
               },
             ],
           },
@@ -214,7 +223,8 @@ export class TagDialogFactory {
             tag: "div",
             namespace: "html",
             attributes: {
-              style: "border-top: 1px solid var(--fill-quinary, #555); padding-top: 16px;",
+              style:
+                "border-top: 1px solid var(--fill-quinary, #555); padding-top: 16px;",
             },
             children: [
               {
@@ -224,7 +234,8 @@ export class TagDialogFactory {
                   innerText: getString("dialog-manual-input"),
                 },
                 attributes: {
-                  style: "margin: 0 0 8px 0; color: var(--fill-primary, #fff); font-size: 14px;",
+                  style:
+                    "margin: 0 0 8px 0; color: var(--fill-primary, #fff); font-size: 14px;",
                 },
               },
               {
@@ -234,7 +245,8 @@ export class TagDialogFactory {
                   innerText: getString("dialog-add-custom-tag"),
                 },
                 attributes: {
-                  style: "display: block; margin-bottom: 6px; color: var(--fill-secondary, #999); font-size: 13px;",
+                  style:
+                    "display: block; margin-bottom: 6px; color: var(--fill-secondary, #999); font-size: 13px;",
                 },
               },
               {
@@ -244,7 +256,8 @@ export class TagDialogFactory {
                 attributes: {
                   type: "text",
                   placeholder: getString("dialog-tag-placeholder"),
-                  style: "width: 100%; padding: 8px 12px; box-sizing: border-box; background: var(--material-background, #fff); color: var(--fill-primary, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; font-size: 13px;",
+                  style:
+                    "width: 100%; padding: 8px 12px; box-sizing: border-box; background: var(--material-background, #fff); color: var(--fill-primary, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; font-size: 13px;",
                 },
               },
             ],

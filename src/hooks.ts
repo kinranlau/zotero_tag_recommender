@@ -1,7 +1,4 @@
-import {
-  BasicExampleFactory,
-  UIExampleFactory,
-} from "./modules/examples";
+import { BasicExampleFactory, UIExampleFactory } from "./modules/examples";
 import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";

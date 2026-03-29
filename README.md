@@ -10,10 +10,12 @@ AI-powered tag suggestions from your papers’ titles and abstracts, aligned wit
 ## Quick start
 
 **You only need:**
+
 1. The plugin `.xpi` installed in Zotero
 2. An API key from OpenAI or Anthropic
 
 **Cost-efficient model options:**
+
 - `gpt-4o-mini` (recommended, good performance and cheapest)
 - `gpt-3.5-turbo`
 - `claude-haiku-4-5-20251001`
@@ -21,12 +23,15 @@ AI-powered tag suggestions from your papers’ titles and abstracts, aligned wit
 ## Get started
 
 ### 1) Install the plugin
+
 [image]
+
 1. Download the latest `.xpi` release package.
 2. In Zotero, go to `Tools` -> `Plugins`.
 3. Click the gear icon, choose `Install Plugin From File...`, then select the `.xpi`.
 
 ### 2) Configure API settings
+
 [image]
 
 Open `Edit` -> `Settings` -> `Tag Recommender` and set:
@@ -43,7 +48,9 @@ Default prompt behavior is optimized for:
 - returning a clean comma-separated output
 
 ### 3) Generate and apply tags
+
 [image]
+
 1. Right-click an item and choose `Suggest Tags with AI`.
 2. Click suggested tags to toggle selection.
 3. You can also type additional tags (comma-separated), e.g. surface chemistry, in-situ, PCET.
@@ -78,4 +85,3 @@ Default prompt behavior is optimized for:
 npm install
 npm run build
 ```
-
