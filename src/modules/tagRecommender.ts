@@ -126,29 +126,36 @@ export class TagRecommenderFactory {
     model: string,
   ): Promise<string[]> {
     ztoolkit.log("Calling OpenAI with model:", model);
-    
+
+    let resolvedModel = model || "gpt-4o-mini";
+    if (resolvedModel.startsWith("gpt-5")) {
+      ztoolkit.log("gpt-5 model not supported in this plugin flow, falling back to gpt-4o-mini");
+      resolvedModel = "gpt-4o-mini";
+    }
+    const requestBody: any = {
+      model: resolvedModel,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    };
+    requestBody.temperature = 0.7;
+    requestBody.max_tokens = 150;
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: model || "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 150,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -182,7 +189,7 @@ export class TagRecommenderFactory {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: model || "claude-3-haiku-20240307",
+        model: model || "claude-3-haiku-latest",
         max_tokens: 150,
         messages: [
           {
