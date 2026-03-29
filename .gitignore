@@ -14,3 +14,8 @@ tsconfig.tsbuildinfo
 .scaffold
 build
 logs
+
+# local working notes (keep local, don't push)
+QUICKSTART.md
+TESTING.md
+IMPLEMENTATION.md

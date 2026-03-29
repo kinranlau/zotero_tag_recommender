@@ -2,7 +2,7 @@
   "name": "zotero-tag-recommender",
   "type": "module",
   "version": "1.0.0",
-  "description": "Zotero Tag Recommender - AI-powered tag suggestions for your papers, built with GitHub Copilot",
+  "description": "AI-powered tag suggestions for your papers",
   "config": {
     "addonName": "Zotero Tag Recommender",
     "addonID": "tagrecommender@zotero.org",
