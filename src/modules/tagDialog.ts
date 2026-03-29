@@ -102,27 +102,9 @@ export class TagDialogFactory {
         }
 
         const doc = win.document;
-        const preview = doc.getElementById("selected-tags-preview") as
-          | HTMLElement
-          | null;
         const tagButtons = doc.querySelectorAll<HTMLButtonElement>(
           "#suggested-tags-container button[data-tag]",
         );
-
-        const updatePreview = () => {
-          if (!preview) {
-            return;
-          }
-          if (selectedTags.size === 0) {
-            preview.textContent = "(Click tags below to add them here)";
-            preview.style.fontStyle = "italic";
-            preview.style.color = "var(--fill-secondary, #999)";
-            return;
-          }
-          preview.textContent = Array.from(selectedTags).join(", ");
-          preview.style.fontStyle = "normal";
-          preview.style.color = "var(--fill-primary, #fff)";
-        };
 
         const updateTagButtonStyle = (
           btn: HTMLButtonElement,
@@ -152,7 +134,6 @@ export class TagDialogFactory {
               selectedTags.add(tag);
             }
             updateTagButtonStyle(btn, !isSelected);
-            updatePreview();
           });
 
           btn.addEventListener("mouseenter", () => {
@@ -166,8 +147,6 @@ export class TagDialogFactory {
             }
           });
         });
-
-        updatePreview();
       },
     };
 
@@ -177,7 +156,7 @@ export class TagDialogFactory {
         tag: "div",
         namespace: "html",
         attributes: {
-          style: "padding: 20px; width: 540px;",
+          style: "padding: 20px; width: 540px; max-height: 420px; overflow-y: auto; overflow-x: hidden; box-sizing: border-box;",
         },
         children: [
           {
@@ -190,37 +169,6 @@ export class TagDialogFactory {
               style: "margin: 0 0 16px 0; color: var(--fill-primary, #fff);",
             },
           },
-          // Preview area showing selected tags
-          {
-            tag: "div",
-            namespace: "html",
-            attributes: {
-              style: "margin-bottom: 20px; padding: 12px; background: rgba(0, 102, 204, 0.1); border: 1px solid #0066cc; border-radius: 4px; min-height: 40px;",
-            },
-            children: [
-              {
-                tag: "div",
-                namespace: "html",
-                properties: {
-                  innerText: "Tags to be added:",
-                },
-                attributes: {
-                  style: "font-weight: 500; margin-bottom: 8px; color: var(--fill-primary, #fff); font-size: 13px;",
-                },
-              },
-              {
-                tag: "div",
-                namespace: "html",
-                id: "selected-tags-preview",
-                attributes: {
-                  style: "min-height: 24px; color: var(--fill-secondary, #999); font-size: 12px; font-style: italic;",
-                },
-                properties: {
-                  innerText: "(Click tags below to add them here)",
-                },
-              },
-            ],
-          },
           // Suggested tags as clickable buttons
           {
             tag: "div",
@@ -229,16 +177,6 @@ export class TagDialogFactory {
               style: "margin-bottom: 20px;",
             },
             children: [
-              {
-                tag: "h4",
-                namespace: "html",
-                properties: {
-                  innerText: getString("dialog-title"),
-                },
-                attributes: {
-                  style: "margin: 0 0 12px 0; color: var(--fill-primary, #fff); font-size: 14px;",
-                },
-              },
               {
                 tag: "div",
                 namespace: "html",
@@ -293,7 +231,7 @@ export class TagDialogFactory {
                 tag: "label",
                 namespace: "html",
                 properties: {
-                  innerText: "Add custom tags (comma-separated):",
+                  innerText: getString("dialog-add-custom-tag"),
                 },
                 attributes: {
                   style: "display: block; margin-bottom: 6px; color: var(--fill-secondary, #999); font-size: 13px;",
@@ -305,7 +243,7 @@ export class TagDialogFactory {
                 id: "manual-tag-input",
                 attributes: {
                   type: "text",
-                  placeholder: "e.g., machine learning, neural networks",
+                  placeholder: getString("dialog-tag-placeholder"),
                   style: "width: 100%; padding: 8px 12px; box-sizing: border-box; background: rgba(0,0,0,0.3); color: var(--fill-primary, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; font-size: 13px;",
                 },
               },
@@ -374,7 +312,7 @@ export class TagDialogFactory {
         width: 560,
         height: 520,
         centerscreen: true,
-        resizable: true,
+        resizable: false,
       });
 
     await dialogData.unloadLock?.promise;

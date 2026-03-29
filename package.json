@@ -2,7 +2,7 @@
   "name": "zotero-tag-recommender",
   "type": "module",
   "version": "1.0.0",
-  "description": "Zotero Tag Recommender - AI-powered tag suggestions for your papers",
+  "description": "Zotero Tag Recommender - AI-powered tag suggestions for your papers, built with GitHub Copilot",
   "config": {
     "addonName": "Zotero Tag Recommender",
     "addonID": "tagrecommender@zotero.org",
@@ -12,13 +12,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/zotero-tag-recommender.git"
+    "url": "git+https://github.com/kinranlau/zotero-tag-recommender.git"
   },
-  "author": "Your Name",
+  "author": "Kinran Lau",
   "bugs": {
-    "url": "https://github.com/yourusername/zotero-tag-recommender/issues"
+    "url": "https://github.com/kinranlau/zotero-tag-recommender/issues"
   },
-  "homepage": "https://github.com/yourusername/zotero-tag-recommender#readme",
+  "homepage": "https://github.com/kinranlau/zotero-tag-recommender#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",
