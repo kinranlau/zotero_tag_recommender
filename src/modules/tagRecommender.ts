@@ -179,8 +179,19 @@ export class TagRecommenderFactory {
     maxTags: number,
     model: string,
   ): Promise<string[]> {
-    ztoolkit.log("Calling Anthropic with model:", model);
-    
+    let resolvedModel = model || "claude-haiku-4-5-20251001";
+    if (
+      resolvedModel === "claude-3-haiku-20240307" ||
+      resolvedModel === "claude-3-haiku-latest" ||
+      resolvedModel === "claude-3-5-haiku-latest"
+    ) {
+      ztoolkit.log(
+        "Deprecated/legacy Claude model value detected, falling back to claude-haiku-4-5-20251001",
+      );
+      resolvedModel = "claude-haiku-4-5-20251001";
+    }
+    ztoolkit.log("Calling Anthropic with model:", resolvedModel);
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -189,7 +200,7 @@ export class TagRecommenderFactory {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: model || "claude-3-haiku-latest",
+        model: resolvedModel,
         max_tokens: 150,
         messages: [
           {

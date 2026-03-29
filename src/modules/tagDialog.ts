@@ -182,7 +182,7 @@ export class TagDialogFactory {
                 namespace: "html",
                 id: "suggested-tags-container",
                 attributes: {
-                  style: "display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; max-height: 200px; overflow-y: auto;",
+                  style: "display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--material-background, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; max-height: 200px; overflow-y: auto;",
                 },
                 children: suggestedTags.length > 0 ? suggestedTags.map((tag, index) => ({
                   tag: "button",
@@ -244,7 +244,7 @@ export class TagDialogFactory {
                 attributes: {
                   type: "text",
                   placeholder: getString("dialog-tag-placeholder"),
-                  style: "width: 100%; padding: 8px 12px; box-sizing: border-box; background: rgba(0,0,0,0.3); color: var(--fill-primary, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; font-size: 13px;",
+                  style: "width: 100%; padding: 8px 12px; box-sizing: border-box; background: var(--material-background, #fff); color: var(--fill-primary, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; font-size: 13px;",
                 },
               },
             ],
