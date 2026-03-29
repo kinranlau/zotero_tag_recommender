@@ -1,5 +1,10 @@
-pref-title = Addon Template Example
-pref-enable =
-    .label = Enable
-pref-input = Input
+pref-title = Tag Recommender Settings
+pref-api-settings = API Configuration
+pref-api-provider = API Provider:
+pref-api-model = Model:
+pref-api-key = API Key:
+pref-prompt-settings = Tag Generation Settings
+pref-max-tags = Maximum Tags:
+pref-custom-prompt = Custom Prompt Template:
+pref-prompt-help = Use {title}, {abstract}, and {tags} as placeholders in your prompt.
 pref-help = { $name } Build { $version } { $time }
