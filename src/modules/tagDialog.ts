@@ -93,10 +93,81 @@ export class TagDialogFactory {
     suggestedTags: string[],
   ): Promise<void> {
     const selectedTags = new Set<string>();
-    
+
     const dialogData: { [key: string | number]: any } = {
       loadCallback: () => {
-        ztoolkit.log("Dialog loaded");
+        const win = dialog.window;
+        if (!win) {
+          return;
+        }
+
+        const doc = win.document;
+        const preview = doc.getElementById("selected-tags-preview") as
+          | HTMLElement
+          | null;
+        const tagButtons = doc.querySelectorAll<HTMLButtonElement>(
+          "#suggested-tags-container button[data-tag]",
+        );
+
+        const updatePreview = () => {
+          if (!preview) {
+            return;
+          }
+          if (selectedTags.size === 0) {
+            preview.textContent = "(Click tags below to add them here)";
+            preview.style.fontStyle = "italic";
+            preview.style.color = "var(--fill-secondary, #999)";
+            return;
+          }
+          preview.textContent = Array.from(selectedTags).join(", ");
+          preview.style.fontStyle = "normal";
+          preview.style.color = "var(--fill-primary, #fff)";
+        };
+
+        const updateTagButtonStyle = (
+          btn: HTMLButtonElement,
+          isSelected: boolean,
+        ) => {
+          btn.setAttribute("data-selected", isSelected ? "true" : "false");
+          btn.style.background = isSelected
+            ? "#0066cc"
+            : "rgba(0, 102, 204, 0.15)";
+          btn.style.borderColor = "#0066cc";
+          btn.style.fontWeight = isSelected ? "500" : "normal";
+        };
+
+        tagButtons.forEach((btn: HTMLButtonElement) => {
+          const tag = (btn.getAttribute("data-tag") || "").trim();
+          if (!tag) {
+            return;
+          }
+
+          updateTagButtonStyle(btn, false);
+          btn.addEventListener("click", (event: MouseEvent) => {
+            event.preventDefault();
+            const isSelected = selectedTags.has(tag);
+            if (isSelected) {
+              selectedTags.delete(tag);
+            } else {
+              selectedTags.add(tag);
+            }
+            updateTagButtonStyle(btn, !isSelected);
+            updatePreview();
+          });
+
+          btn.addEventListener("mouseenter", () => {
+            if (!selectedTags.has(tag)) {
+              btn.style.background = "rgba(0, 102, 204, 0.3)";
+            }
+          });
+          btn.addEventListener("mouseleave", () => {
+            if (!selectedTags.has(tag)) {
+              btn.style.background = "rgba(0, 102, 204, 0.15)";
+            }
+          });
+        });
+
+        updatePreview();
       },
     };
 
@@ -245,35 +316,30 @@ export class TagDialogFactory {
       .addButton(getString("dialog-apply-button"), "apply", {
         callback: async (e) => {
           try {
-            // Collect tags from buttons marked as selected
+            // Collect manual tags and merge with selected suggested tags
             const win = dialog.window;
             if (win) {
               const doc = win.document;
-              
-              // Get all tag buttons and check which are selected
-              suggestedTags.forEach((tag, index) => {
-                const btn = doc.getElementById(`tag-btn-${index}`) as HTMLButtonElement;
-                if (btn && btn.getAttribute("data-selected") === "true") {
-                  selectedTags.add(tag);
-                }
-              });
-              
-              // Add manual tags
-              const manualInput = doc.getElementById("manual-tag-input") as HTMLInputElement;
+              const manualInput = doc.getElementById(
+                "manual-tag-input",
+              ) as HTMLInputElement | null;
               const manualTag = manualInput?.value.trim();
               if (manualTag) {
-                const manualTags = manualTag.split(",").map((t) => t.trim()).filter((t) => t);
-                manualTags.forEach(t => selectedTags.add(t));
+                const manualTags = manualTag
+                  .split(",")
+                  .map((t) => t.trim())
+                  .filter((t) => t);
+                manualTags.forEach((t) => selectedTags.add(t));
               }
             }
-            
+
             const tagsToApply: string[] = Array.from(selectedTags);
             ztoolkit.log("Applying tags:", tagsToApply);
 
             if (tagsToApply.length === 0) {
               new ztoolkit.ProgressWindow(config.addonName)
                 .createLine({
-                  text: "No tags selected",
+                  text: getString("dialog-no-tags-selected"),
                   type: "default",
                 })
                 .show(-1);
@@ -281,14 +347,16 @@ export class TagDialogFactory {
             }
 
             await TagRecommenderFactory.applyTags(item, tagsToApply);
-            
+
             new ztoolkit.ProgressWindow(config.addonName)
               .createLine({
-                text: `Successfully applied ${tagsToApply.length} tag(s)`,
+                text: getString("dialog-tags-applied", {
+                  args: { count: tagsToApply.length },
+                }),
                 type: "success",
               })
               .show(-1);
-              
+
             ztoolkit.log(`Applied ${tagsToApply.length} tags successfully`);
           } catch (error: any) {
             ztoolkit.log("Error:", error);
@@ -308,75 +376,6 @@ export class TagDialogFactory {
         centerscreen: true,
         resizable: true,
       });
-
-    // Attach click handlers to tag buttons after dialog opens
-    if (dialog.window) {
-      const doc = dialog.window.document;
-      const preview = doc.getElementById("selected-tags-preview") as HTMLElement;
-      
-      const updatePreview = () => {
-        const selected: string[] = [];
-        suggestedTags.forEach((tag, index) => {
-          const btn = doc.getElementById(`tag-btn-${index}`) as HTMLButtonElement;
-          if (btn && btn.getAttribute("data-selected") === "true") {
-            selected.push(tag);
-          }
-        });
-        
-        if (preview) {
-          if (selected.length === 0) {
-            preview.textContent = "(Click tags below to add them here)";
-            preview.style.fontStyle = "italic";
-            preview.style.color = "var(--fill-secondary, #999)";
-          } else {
-            preview.textContent = selected.join(", ");
-            preview.style.fontStyle = "normal";
-            preview.style.color = "var(--fill-primary, #fff)";
-          }
-        }
-      };
-      
-      suggestedTags.forEach((tag, index) => {
-        const btn = doc.getElementById(`tag-btn-${index}`) as HTMLButtonElement;
-        if (btn) {
-          btn.addEventListener("click", () => {
-            const isSelected = btn.getAttribute("data-selected") === "true";
-            
-            if (isSelected) {
-              // Deselect
-              btn.setAttribute("data-selected", "false");
-              btn.style.background = "rgba(0, 102, 204, 0.15)";
-              btn.style.borderColor = "#0066cc";
-              btn.style.fontWeight = "normal";
-            } else {
-              // Select
-              btn.setAttribute("data-selected", "true");
-              btn.style.background = "#0066cc";
-              btn.style.borderColor = "#0066cc";
-              btn.style.fontWeight = "500";
-            }
-            
-            updatePreview();
-            ztoolkit.log("Tag toggled:", tag, "| Selected:", !isSelected);
-          });
-          
-          // Hover effects
-          btn.addEventListener("mouseenter", () => {
-            if (btn.getAttribute("data-selected") !== "true") {
-              btn.style.background = "rgba(0, 102, 204, 0.3)";
-            }
-          });
-          
-          btn.addEventListener("mouseleave", () => {
-            if (btn.getAttribute("data-selected") !== "true") {
-              btn.style.background = "rgba(0, 102, 204, 0.15)";
-            }
-          });
-        }
-      });
-      
-      ztoolkit.log("Click handlers attached to", suggestedTags.length, "tag buttons");
-    }
 
     await dialogData.unloadLock?.promise;
   }
