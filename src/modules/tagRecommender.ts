@@ -2,12 +2,33 @@ import { config } from "../../package.json";
 
 export class TagRecommenderFactory {
   /**
-   * Get all existing tags in the library
+   * Get the most frequent existing tags in the library
    */
   static async getExistingTags(): Promise<string[]> {
     const libraryID = Zotero.Libraries.userLibraryID;
     const tags = await Zotero.Tags.getAll(libraryID);
-    return tags.map((tag) => tag.tag);
+    const tagsWithIDs = tags
+      .map((tag) => {
+        const tagName = tag.tag.trim();
+        const tagID = Zotero.Tags.getID(tagName);
+        return {
+          tag: tagName,
+          tagID: typeof tagID === "number" ? tagID : null,
+        };
+      })
+      .filter((entry) => entry.tag && entry.tagID !== null);
+
+    const tagUsage = await Promise.all(
+      tagsWithIDs.map(async ({ tag, tagID }) => {
+        const itemIDs = await Zotero.Tags.getTagItems(libraryID, tagID!);
+        return { tag, count: itemIDs.length };
+      }),
+    );
+
+    return tagUsage
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 100)
+      .map((entry) => entry.tag);
   }
 
   /**
@@ -66,13 +87,14 @@ export class TagRecommenderFactory {
     }
 
     // Build the prompt
-    const tagsString = existingTags.slice(0, 100).join(", ");
+    const tagsString = existingTags.join(", ");
     const prompt = customPrompt
       .replace("{title}", title)
       .replace("{abstract}", abstract || "No abstract available")
       .replace("{tags}", tagsString || "No existing tags");
 
     ztoolkit.log("Generated prompt:", prompt.substring(0, 200) + "...");
+    ztoolkit.log("Top library tags count sent:", existingTags.length);
 
     let suggestions: string[] = [];
 
