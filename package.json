@@ -12,13 +12,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kinranlau/zotero-tag-recommender.git"
+    "url": "git+https://github.com/kinranlau/zotero_tag_recommender.git"
   },
   "author": "Kinran Lau",
   "bugs": {
-    "url": "https://github.com/kinranlau/zotero-tag-recommender/issues"
+    "url": "https://github.com/kinranlau/zotero_tag_recommender/issues"
   },
-  "homepage": "https://github.com/kinranlau/zotero-tag-recommender#readme",
+  "homepage": "https://github.com/kinranlau/zotero_tag_recommender#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",
