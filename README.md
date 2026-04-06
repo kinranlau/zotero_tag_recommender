@@ -14,6 +14,8 @@ An AI-powered Zotero plugin that suggests tags from a paper’s title and abstra
 1. The plugin `.xpi` installed in Zotero [(Latest Release)](https://github.com/kinranlau/zotero_tag_recommender/releases)
 2. An API key from [OpenAI](https://platform.openai.com/) or [Anthropic](https://platform.claude.com/)
 
+More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest Tags for Your Papers](https://medium.com/@kinran_lau/zotero-tag-recommender-using-ai-to-suggest-tags-for-your-papers-a850a0b933ac)
+
 **Cost-efficient model options:**
 
 - `gpt-4o-mini` (recommended, good performance and cheapest)
@@ -23,6 +25,7 @@ An AI-powered Zotero plugin that suggests tags from a paper’s title and abstra
 ## Get started
 
 ### 1) Install the plugin
+
 <img src="demo/1_install_plugin.png" width="600">
 
 1. [Download the latest `.xpi` release package.](https://github.com/kinranlau/zotero_tag_recommender/releases)
@@ -30,6 +33,7 @@ An AI-powered Zotero plugin that suggests tags from a paper’s title and abstra
 3. Click the gear icon, choose `Install Plugin From File...`, then select the `.xpi`.
 
 ### 2) Configure API settings
+
 <img src="demo/2_api_settings.png" width="600">
 
 Open `Edit` -> `Settings` -> `Tag Recommender` and set:
@@ -46,6 +50,7 @@ Default prompt behavior is optimized for:
 - returning a clean comma-separated output
 
 ### 3) Generate and apply tags
+
 <img src="demo/3_generate_tags.png" width="600">
 
 1. Right-click an item and choose `Suggest Tags with AI`.
