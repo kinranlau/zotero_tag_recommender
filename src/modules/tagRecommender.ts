@@ -1,6 +1,9 @@
 import { config } from "../../package.json";
 
 export class TagRecommenderFactory {
+  private static readonly TAG_SYSTEM_PROMPT =
+    "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.";
+
   /**
    * Get the most frequent existing tags in the library
    */
@@ -109,6 +112,15 @@ export class TagRecommenderFactory {
           maxTags,
           apiModel,
         );
+      } else if (apiProvider === "google") {
+        suggestions = await this.callGemini(apiKey, prompt, maxTags, apiModel);
+      } else if (apiProvider === "deepseek") {
+        suggestions = await this.callDeepSeek(
+          apiKey,
+          prompt,
+          maxTags,
+          apiModel,
+        );
       } else {
         throw new Error(`Unsupported API provider: ${apiProvider}`);
       }
@@ -131,22 +143,18 @@ export class TagRecommenderFactory {
     maxTags: number,
     model: string,
   ): Promise<string[]> {
-    ztoolkit.log("Calling OpenAI with model:", model);
-
-    let resolvedModel = model || "gpt-4o-mini";
-    if (resolvedModel.startsWith("gpt-5")) {
-      ztoolkit.log(
-        "gpt-5 model not supported in this plugin flow, falling back to gpt-4o-mini",
-      );
-      resolvedModel = "gpt-4o-mini";
+    const resolvedModel = model?.trim();
+    if (!resolvedModel) {
+      throw new Error("API model is not configured. Please select a model.");
     }
+    ztoolkit.log("Calling OpenAI with model:", resolvedModel);
+
     const requestBody: any = {
       model: resolvedModel,
       messages: [
         {
           role: "system",
-          content:
-            "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.",
+          content: this.TAG_SYSTEM_PROMPT,
         },
         {
           role: "user",
@@ -187,16 +195,9 @@ export class TagRecommenderFactory {
     maxTags: number,
     model: string,
   ): Promise<string[]> {
-    let resolvedModel = model || "claude-haiku-4-5-20251001";
-    if (
-      resolvedModel === "claude-3-haiku-20240307" ||
-      resolvedModel === "claude-3-haiku-latest" ||
-      resolvedModel === "claude-3-5-haiku-latest"
-    ) {
-      ztoolkit.log(
-        "Deprecated/legacy Claude model value detected, falling back to claude-haiku-4-5-20251001",
-      );
-      resolvedModel = "claude-haiku-4-5-20251001";
+    const resolvedModel = model?.trim();
+    if (!resolvedModel) {
+      throw new Error("API model is not configured. Please select a model.");
     }
     ztoolkit.log("Calling Anthropic with model:", resolvedModel);
 
@@ -213,9 +214,7 @@ export class TagRecommenderFactory {
         messages: [
           {
             role: "user",
-            content:
-              "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.\n\n" +
-              prompt,
+            content: `${this.TAG_SYSTEM_PROMPT}\n\n${prompt}`,
           },
         ],
       }),
@@ -230,6 +229,111 @@ export class TagRecommenderFactory {
     const data = await response.json();
     ztoolkit.log("Anthropic API response:", data);
     const content = (data as any).content?.[0]?.text || "";
+    return this.parseTags(content, maxTags);
+  }
+
+  /**
+   * Call Google Gemini API
+   */
+  private static async callGemini(
+    apiKey: string,
+    prompt: string,
+    maxTags: number,
+    model: string,
+  ): Promise<string[]> {
+    const resolvedModel = model?.trim();
+    if (!resolvedModel) {
+      throw new Error("API model is not configured. Please select a model.");
+    }
+    ztoolkit.log("Calling Gemini with model:", resolvedModel);
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(resolvedModel)}:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: this.TAG_SYSTEM_PROMPT }],
+          },
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 150,
+          },
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      ztoolkit.log("Gemini API error response:", error);
+      throw new Error(`Gemini API error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    ztoolkit.log("Gemini API response:", data);
+    const content = ((data as any).candidates?.[0]?.content?.parts || [])
+      .map((part: any) => part?.text || "")
+      .join(" ")
+      .trim();
+    return this.parseTags(content, maxTags);
+  }
+
+  /**
+   * Call DeepSeek API
+   */
+  private static async callDeepSeek(
+    apiKey: string,
+    prompt: string,
+    maxTags: number,
+    model: string,
+  ): Promise<string[]> {
+    const resolvedModel = model?.trim();
+    if (!resolvedModel) {
+      throw new Error("API model is not configured. Please select a model.");
+    }
+    ztoolkit.log("Calling DeepSeek with model:", resolvedModel);
+
+    const response = await fetch("https://api.deepseek.com/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: resolvedModel,
+        messages: [
+          {
+            role: "system",
+            content: this.TAG_SYSTEM_PROMPT,
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 150,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      ztoolkit.log("DeepSeek API error response:", error);
+      throw new Error(`DeepSeek API error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    ztoolkit.log("DeepSeek API response:", data);
+    const content = (data as any).choices?.[0]?.message?.content || "";
     return this.parseTags(content, maxTags);
   }
 
