@@ -1,6 +1,6 @@
 # Zotero Tag Recommender
 
-[![zotero target version](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
+[![zotero target version](https://img.shields.io/badge/Zotero-9-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
 [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
 An AI-powered Zotero plugin that suggests tags from a paper’s title and abstract, aligned with your existing tag vocabulary.
@@ -12,15 +12,18 @@ An AI-powered Zotero plugin that suggests tags from a paper’s title and abstra
 **You only need:**
 
 1. The plugin `.xpi` installed in Zotero [(Latest Release)](https://github.com/kinranlau/zotero_tag_recommender/releases)
-2. An API key from [OpenAI](https://platform.openai.com/) or [Anthropic](https://platform.claude.com/)
+2. An API key from [OpenAI](https://platform.openai.com/), [Anthropic](https://platform.claude.com/), [Google](https://aistudio.google.com/), or [DeepSeek](https://platform.deepseek.com/)
 
 More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest Tags for Your Papers](https://medium.com/@kinran_lau/zotero-tag-recommender-using-ai-to-suggest-tags-for-your-papers-a850a0b933ac)
 
 **Cost-efficient model options:**
 
-- `gpt-4o-mini` (recommended, good performance and cheapest)
+- `gpt-4o-mini` (recommended, cheap and good performance)
 - `gpt-3.5-turbo`
 - `claude-haiku-4-5-20251001`
+- `gemini-3.1-flash-lite-preview` (up to 500 free requests/day; data may be used by Google in free tier)
+- `gemini-2.5-flash-lite`
+- `deepseek-chat`
 
 ## Get started
 
@@ -38,7 +41,7 @@ More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest 
 
 Open `Edit` -> `Settings` -> `Tag Recommender` and set:
 
-- `API Provider` (`OpenAI` or `Anthropic`; this must match your API key)
+- `API Provider` (`OpenAI`, `Anthropic`, `Google`, or `DeepSeek`; this must match your API key)
 - `Model`
 - `API Key`
 - optional: `Maximum Tags`
