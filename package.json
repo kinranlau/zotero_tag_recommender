@@ -1,5 +1,5 @@
 {
-  "name": "zotero-tag-recommender",
+  "name": "zotero_tag_recommender",
   "type": "module",
   "version": "1.0.0",
   "description": "AI-powered tag suggestions for your papers",
