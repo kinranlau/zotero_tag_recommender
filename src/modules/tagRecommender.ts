@@ -35,6 +35,18 @@ export class TagRecommenderFactory {
   }
 
   /**
+   * Get all unique tags in the library for custom-tag autocomplete
+   */
+  static async getAllLibraryTags(): Promise<string[]> {
+    const libraryID = Zotero.Libraries.userLibraryID;
+    const tags = await Zotero.Tags.getAll(libraryID);
+    const uniqueTags = new Set(
+      tags.map((tag) => tag.tag.trim()).filter((tag) => tag.length > 0),
+    );
+    return Array.from(uniqueTags);
+  }
+
+  /**
    * Get title and abstract for an item
    */
   static getItemMetadata(item: Zotero.Item): {
