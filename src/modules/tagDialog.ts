@@ -118,6 +118,8 @@ export class TagDialogFactory {
           "custom-tag-autocomplete",
         ) as HTMLElement | null;
         let debounceTimer: number | undefined;
+        let autocompleteMatches: string[] = [];
+        let activeAutocompleteIndex = -1;
 
         const updateTagButtonStyle = (
           btn: HTMLButtonElement,
@@ -158,9 +160,52 @@ export class TagDialogFactory {
           });
         };
 
+        const getAutocompleteButtons = () => {
+          if (!autocompleteContainer) {
+            return [] as HTMLButtonElement[];
+          }
+          const buttons = autocompleteContainer.querySelectorAll(
+            "button[data-autocomplete-index]",
+          );
+          return Array.from(buttons) as HTMLButtonElement[];
+        };
+
+        const setActiveAutocompleteIndex = (nextIndex: number) => {
+          const buttons = getAutocompleteButtons();
+          if (buttons.length === 0) {
+            activeAutocompleteIndex = -1;
+            return;
+          }
+          activeAutocompleteIndex = nextIndex;
+          buttons.forEach((button, index) => {
+            button.style.background =
+              index === activeAutocompleteIndex
+                ? "rgba(0, 102, 204, 0.15)"
+                : "transparent";
+          });
+          buttons[activeAutocompleteIndex]?.scrollIntoView({
+            block: "nearest",
+          });
+        };
+
+        const selectAutocompleteTag = (tag: string) => {
+          if (!manualInput) {
+            return;
+          }
+          customSelectedTags.add(tag);
+          renderCustomSelectedTags();
+          manualInput.value = "";
+          renderAutocomplete([]);
+          manualInput.focus();
+        };
+
         const findPrefixMatches = (rawQuery: string): string[] => {
-          const query = rawQuery.trim().toLowerCase();
-          if (!query) {
+          const queryTerms = rawQuery
+            .toLowerCase()
+            .trim()
+            .split(/\s+/)
+            .filter((term) => term.length > 0);
+          if (queryTerms.length === 0) {
             return [];
           }
           return libraryTags
@@ -173,7 +218,9 @@ export class TagDialogFactory {
                 return false;
               }
               const words = tag.toLowerCase().match(/[a-z0-9]+/g) || [];
-              return words.some((word) => word.startsWith(query));
+              return queryTerms.every((queryTerm) =>
+                words.some((word) => word.startsWith(queryTerm)),
+              );
             })
             .slice(0, 8);
         };
@@ -183,14 +230,17 @@ export class TagDialogFactory {
             return;
           }
           autocompleteContainer.innerHTML = "";
+          autocompleteMatches = matches;
+          activeAutocompleteIndex = -1;
           if (matches.length === 0) {
             autocompleteContainer.style.display = "none";
             return;
           }
-          matches.forEach((tag) => {
+          matches.forEach((tag, index) => {
             const option = doc.createElement("button");
             option.type = "button";
             option.textContent = tag;
+            option.setAttribute("data-autocomplete-index", String(index));
             option.style.display = "block";
             option.style.width = "100%";
             option.style.padding = "8px 10px";
@@ -201,20 +251,20 @@ export class TagDialogFactory {
             option.style.cursor = "pointer";
             option.style.fontSize = "13px";
             option.addEventListener("mouseenter", () => {
-              option.style.background = "rgba(0, 102, 204, 0.15)";
+              setActiveAutocompleteIndex(index);
             });
             option.addEventListener("mouseleave", () => {
-              option.style.background = "transparent";
+              if (index === activeAutocompleteIndex) {
+                option.style.background = "rgba(0, 102, 204, 0.15)";
+              } else {
+                option.style.background = "transparent";
+              }
             });
             option.addEventListener("mousedown", (event) => {
               event.preventDefault();
             });
             option.addEventListener("click", () => {
-              customSelectedTags.add(tag);
-              renderCustomSelectedTags();
-              manualInput.value = "";
-              renderAutocomplete([]);
-              manualInput.focus();
+              selectAutocompleteTag(tag);
             });
             autocompleteContainer.appendChild(option);
           });
@@ -289,10 +339,40 @@ export class TagDialogFactory {
           });
 
           manualInput.addEventListener("keydown", (event: KeyboardEvent) => {
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              if (autocompleteMatches.length === 0) {
+                return;
+              }
+              event.preventDefault();
+              const lastIndex = autocompleteMatches.length - 1;
+              const nextIndex =
+                event.key === "ArrowDown"
+                  ? activeAutocompleteIndex < lastIndex
+                    ? activeAutocompleteIndex + 1
+                    : 0
+                  : activeAutocompleteIndex > 0
+                    ? activeAutocompleteIndex - 1
+                    : lastIndex;
+              setActiveAutocompleteIndex(nextIndex);
+              return;
+            }
+            if (event.key === "Escape") {
+              renderAutocomplete([]);
+              return;
+            }
             if (event.key !== "Enter") {
               return;
             }
             event.preventDefault();
+            if (
+              activeAutocompleteIndex >= 0 &&
+              activeAutocompleteIndex < autocompleteMatches.length
+            ) {
+              selectAutocompleteTag(
+                autocompleteMatches[activeAutocompleteIndex],
+              );
+              return;
+            }
             const tag = manualInput.value.trim();
             if (!tag) {
               return;
@@ -323,7 +403,7 @@ export class TagDialogFactory {
         namespace: "html",
         attributes: {
           style:
-            "padding: 20px; width: 540px; max-height: 420px; overflow-y: auto; overflow-x: hidden; box-sizing: border-box;",
+            "padding: 20px; width: 540px; max-height: 620px; overflow-y: auto; overflow-x: hidden; box-sizing: border-box;",
         },
         children: [
           {
@@ -350,7 +430,7 @@ export class TagDialogFactory {
                 id: "suggested-tags-container",
                 attributes: {
                   style:
-                    "display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--material-background, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; max-height: 200px; overflow-y: auto;",
+                    "display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--material-background, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; max-height: 180px; overflow-y: auto;",
                 },
                 children:
                   suggestedTags.length > 0
@@ -419,8 +499,7 @@ export class TagDialogFactory {
                 tag: "div",
                 namespace: "html",
                 attributes: {
-                  style:
-                    "position: relative; width: 100%; box-sizing: border-box;",
+                  style: "width: 100%; box-sizing: border-box;",
                 },
                 children: [
                   {
@@ -440,7 +519,7 @@ export class TagDialogFactory {
                     id: "custom-tag-autocomplete",
                     attributes: {
                       style:
-                        "display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; max-height: 180px; overflow-y: auto; background: var(--material-background, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; z-index: 20; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);",
+                        "display: none; margin-top: 4px; max-height: 130px; overflow-y: auto; background: var(--material-background, #fff); border: 1px solid var(--fill-quinary, #555); border-radius: 4px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);",
                     },
                   },
                 ],
@@ -519,7 +598,7 @@ export class TagDialogFactory {
       .addButton(getString("dialog-cancel-button"), "cancel")
       .open(getString("dialog-window-title"), {
         width: 560,
-        height: 520,
+        height: 600,
         centerscreen: true,
         resizable: false,
       });
