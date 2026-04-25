@@ -26,6 +26,7 @@ export type FluentMessageId =
   | 'pref-api-provider'
   | 'pref-api-settings'
   | 'pref-custom-prompt'
+  | 'pref-enable-ai-suggestions'
   | 'pref-help'
   | 'pref-max-tags'
   | 'pref-prompt-help'

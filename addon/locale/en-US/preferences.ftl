@@ -1,4 +1,6 @@
 pref-title = Tag Recommender Settings
+pref-enable-ai-suggestions =
+    .label = Enable AI tag recommendations
 pref-api-settings = API Configuration
 pref-api-provider = API Provider:
 pref-api-model = Model:

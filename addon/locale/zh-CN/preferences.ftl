@@ -1,4 +1,6 @@
 pref-title = 标签推荐器设置
+pref-enable-ai-suggestions =
+    .label = 启用 AI 标签推荐
 pref-api-settings = API 配置
 pref-api-provider = API 提供商:
 pref-api-model = 模型:

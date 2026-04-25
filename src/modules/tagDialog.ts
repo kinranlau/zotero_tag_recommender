@@ -33,6 +33,27 @@ export class TagDialogFactory {
     }
 
     const item = items[0];
+    const enableAISuggestionsPref = Zotero.Prefs.get(
+      `${config.prefsPrefix}.enableAISuggestions`,
+      true,
+    );
+    const enableAISuggestions = enableAISuggestionsPref !== false;
+
+    if (!enableAISuggestions) {
+      try {
+        const allLibraryTags = await TagRecommenderFactory.getAllLibraryTags();
+        await this.showSelectionDialog(item, [], allLibraryTags);
+      } catch (error: any) {
+        new ztoolkit.ProgressWindow(config.addonName)
+          .createLine({
+            text: `${getString("dialog-error")}: ${error.message}`,
+            type: "error",
+          })
+          .show(-1);
+        ztoolkit.log("Error opening tag dialog:", error);
+      }
+      return;
+    }
 
     // Show progress
     const progressWin = new ztoolkit.ProgressWindow(config.addonName, {
@@ -55,8 +76,10 @@ export class TagDialogFactory {
       });
 
       // Get existing tags
-      const existingTags = await TagRecommenderFactory.getExistingTags();
-      const allLibraryTags = await TagRecommenderFactory.getAllLibraryTags();
+      const [existingTags, allLibraryTags] = await Promise.all([
+        TagRecommenderFactory.getExistingTags(),
+        TagRecommenderFactory.getAllLibraryTags(),
+      ]);
 
       progressWin.changeLine({
         text: getString("dialog-calling-api"),
@@ -449,19 +472,7 @@ export class TagDialogFactory {
                           textContent: tag,
                         },
                       }))
-                    : [
-                        {
-                          tag: "div",
-                          namespace: "html",
-                          attributes: {
-                            style:
-                              "padding: 20px; text-align: center; font-style: italic; color: var(--fill-secondary, #888); width: 100%;",
-                          },
-                          properties: {
-                            textContent: getString("dialog-no-suggestions"),
-                          },
-                        },
-                      ],
+                    : [],
               },
             ],
           },

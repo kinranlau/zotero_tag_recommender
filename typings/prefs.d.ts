@@ -8,6 +8,7 @@ declare namespace _ZoteroTypes {
   interface Prefs {
     PluginPrefsMap: {
       "apiKey": string;
+      "enableAISuggestions": boolean;
       "apiProvider": string;
       "apiModel": string;
       "customPrompt": string;
