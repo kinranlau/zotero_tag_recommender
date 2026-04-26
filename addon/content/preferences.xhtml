@@ -6,6 +6,12 @@
 >
   <label><html:h2 data-l10n-id="pref-title"></html:h2></label>
 
+  <checkbox
+    id="zotero-prefpane-__addonRef__-enableAISuggestions"
+    preference="enableAISuggestions"
+    data-l10n-id="pref-enable-ai-suggestions"
+  />
+
   <label><html:h3 data-l10n-id="pref-api-settings"></html:h3></label>
 
   <hbox align="center">
@@ -47,7 +53,10 @@
           label="Gemini 2.5 Flash-Lite (Google)"
           value="gemini-2.5-flash-lite"
         />
-        <menuitem label="DeepSeek-V3.2 (DeepSeek)" value="deepseek-chat" />
+        <menuitem
+          label="DeepSeek-V4-Flash (DeepSeek)"
+          value="deepseek-v4-flash"
+        />
       </menupopup>
     </menulist>
   </hbox>

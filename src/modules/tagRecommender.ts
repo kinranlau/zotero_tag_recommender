@@ -5,33 +5,67 @@ export class TagRecommenderFactory {
     "You are a helpful assistant that suggests relevant tags for academic papers. Return only the tags as a comma-separated list, nothing else.";
 
   /**
-   * Get the most frequent existing tags in the library
+   * Get normalized unique tags from the library
    */
-  static async getExistingTags(): Promise<string[]> {
+  private static async getNormalizedLibraryTags(): Promise<
+    Array<{ tag: string; tagID: number | null }>
+  > {
     const libraryID = Zotero.Libraries.userLibraryID;
     const tags = await Zotero.Tags.getAll(libraryID);
-    const tagsWithIDs = tags
-      .map((tag) => {
-        const tagName = tag.tag.trim();
+    const seen = new Set<string>();
+
+    return tags
+      .map((tag) => tag.tag.trim())
+      .filter((tagName) => {
+        if (!tagName || seen.has(tagName)) {
+          return false;
+        }
+        seen.add(tagName);
+        return true;
+      })
+      .map((tagName) => {
         const tagID = Zotero.Tags.getID(tagName);
         return {
           tag: tagName,
           tagID: typeof tagID === "number" ? tagID : null,
         };
-      })
-      .filter((entry) => entry.tag && entry.tagID !== null);
+      });
+  }
+
+  /**
+   * Get all library tags and top tags (by usage) in a single query path
+   */
+  static async getLibraryTagSets(): Promise<{
+    allLibraryTags: string[];
+    existingTags: string[];
+  }> {
+    const libraryID = Zotero.Libraries.userLibraryID;
+    const normalizedTags = await this.getNormalizedLibraryTags();
+    const allLibraryTags = normalizedTags.map((entry) => entry.tag);
 
     const tagUsage = await Promise.all(
-      tagsWithIDs.map(async ({ tag, tagID }) => {
-        const itemIDs = await Zotero.Tags.getTagItems(libraryID, tagID!);
-        return { tag, count: itemIDs.length };
-      }),
+      normalizedTags
+        .filter((entry) => entry.tagID !== null)
+        .map(async ({ tag, tagID }) => {
+          const itemIDs = await Zotero.Tags.getTagItems(libraryID, tagID!);
+          return { tag, count: itemIDs.length };
+        }),
     );
 
-    return tagUsage
+    const existingTags = tagUsage
       .sort((a, b) => b.count - a.count)
       .slice(0, 100)
       .map((entry) => entry.tag);
+
+    return { allLibraryTags, existingTags };
+  }
+
+  /**
+   * Get all unique tags in the library for custom-tag autocomplete
+   */
+  static async getAllLibraryTags(): Promise<string[]> {
+    const normalizedTags = await this.getNormalizedLibraryTags();
+    return normalizedTags.map((entry) => entry.tag);
   }
 
   /**
@@ -300,7 +334,9 @@ export class TagRecommenderFactory {
     if (!resolvedModel) {
       throw new Error("API model is not configured. Please select a model.");
     }
-    ztoolkit.log("Calling DeepSeek with model:", resolvedModel);
+    const effectiveModel =
+      resolvedModel === "deepseek-chat" ? "deepseek-v4-flash" : resolvedModel;
+    ztoolkit.log("Calling DeepSeek with model:", effectiveModel);
 
     const response = await fetch("https://api.deepseek.com/chat/completions", {
       method: "POST",
@@ -309,7 +345,7 @@ export class TagRecommenderFactory {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: resolvedModel,
+        model: effectiveModel,
         messages: [
           {
             role: "system",
@@ -320,6 +356,9 @@ export class TagRecommenderFactory {
             content: prompt,
           },
         ],
+        thinking: {
+          type: "disabled",
+        },
         temperature: 0.7,
         max_tokens: 150,
       }),

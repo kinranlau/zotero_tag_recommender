@@ -1,4 +1,5 @@
 pref("apiKey", "");
+pref("enableAISuggestions", true);
 pref("apiProvider", "openai");
 pref("apiModel", "gpt-4o-mini");
 pref(
