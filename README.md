@@ -3,9 +3,9 @@
 [![zotero target version](https://img.shields.io/badge/Zotero-9-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
 [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-An AI-powered Zotero plugin that suggests tags from a paper’s title and abstract, aligned with your existing tag vocabulary. 
+An AI-powered Zotero plugin that suggests tags from a paper’s title and abstract, aligned with your existing tag vocabulary.
 
-Also includes smart tag autocompletion with multi-word matching, so you can find tags using any part of their name *(e.g. “gas” or “GDE" will match “gas diffusion electrode (GDE)”)*.
+Also includes smart tag autocompletion with multi-word matching, so you can find tags using any part of their name _(e.g. “gas” or “GDE" will match “gas diffusion electrode (GDE)”)_.
 
 <img src="demo/demo.gif">
 
@@ -16,7 +16,7 @@ Also includes smart tag autocompletion with multi-word matching, so you can find
 1. The plugin `.xpi` installed in Zotero [(Latest Release)](https://github.com/kinranlau/zotero_tag_recommender/releases)
 2. An API key from [OpenAI](https://platform.openai.com/), [Anthropic](https://platform.claude.com/), [Google](https://aistudio.google.com/), or [DeepSeek](https://platform.deepseek.com/)
 
-*NB: API key only required for AI tag suggestions, not needed for tag autocompletion*
+_NB: API key only required for AI tag suggestions, not needed for tag autocompletion_
 
 More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest Tags for Your Papers](https://medium.com/@kinran_lau/zotero-tag-recommender-using-ai-to-suggest-tags-for-your-papers-a850a0b933ac)
 
@@ -66,7 +66,7 @@ Default prompt behavior is optimized for:
 3. Start typing in the custom tag field to see autocomplete suggestions from your library tags.
 4. Click `Apply Tags` to add all selected tags.
 
-*NB: Autocompletion uses case-insensitive multi-word prefix matching (e.g. typing “gas” or “gde” will match “gas diffusion electrode (GDE)”).*
+_NB: Autocompletion uses case-insensitive multi-word prefix matching (e.g. typing “gas” or “gde” will match “gas diffusion electrode (GDE)”)._
 
 ## Tips for better results
 
