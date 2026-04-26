@@ -334,7 +334,9 @@ export class TagRecommenderFactory {
     if (!resolvedModel) {
       throw new Error("API model is not configured. Please select a model.");
     }
-    ztoolkit.log("Calling DeepSeek with model:", resolvedModel);
+    const effectiveModel =
+      resolvedModel === "deepseek-chat" ? "deepseek-v4-flash" : resolvedModel;
+    ztoolkit.log("Calling DeepSeek with model:", effectiveModel);
 
     const response = await fetch("https://api.deepseek.com/chat/completions", {
       method: "POST",
@@ -343,7 +345,7 @@ export class TagRecommenderFactory {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: resolvedModel,
+        model: effectiveModel,
         messages: [
           {
             role: "system",
@@ -354,6 +356,9 @@ export class TagRecommenderFactory {
             content: prompt,
           },
         ],
+        thinking: {
+          type: "disabled",
+        },
         temperature: 0.7,
         max_tokens: 150,
       }),

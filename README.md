@@ -3,7 +3,9 @@
 [![zotero target version](https://img.shields.io/badge/Zotero-9-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
 [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-An AI-powered Zotero plugin that suggests tags from a paper’s title and abstract, aligned with your existing tag vocabulary.
+An AI-powered Zotero plugin that suggests tags from a paper’s title and abstract, aligned with your existing tag vocabulary. 
+
+Also includes smart tag autocompletion with multi-word matching, so you can find tags using any part of their name *(e.g. “gas” or “GDE" will match “gas diffusion electrode (GDE)”)*.
 
 <img src="demo/demo.gif">
 
@@ -14,6 +16,8 @@ An AI-powered Zotero plugin that suggests tags from a paper’s title and abstra
 1. The plugin `.xpi` installed in Zotero [(Latest Release)](https://github.com/kinranlau/zotero_tag_recommender/releases)
 2. An API key from [OpenAI](https://platform.openai.com/), [Anthropic](https://platform.claude.com/), [Google](https://aistudio.google.com/), or [DeepSeek](https://platform.deepseek.com/)
 
+*NB: API key only required for AI tag suggestions, not needed for tag autocompletion*
+
 More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest Tags for Your Papers](https://medium.com/@kinran_lau/zotero-tag-recommender-using-ai-to-suggest-tags-for-your-papers-a850a0b933ac)
 
 **Cost-efficient model options:**
@@ -23,7 +27,7 @@ More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest 
 - `claude-haiku-4-5-20251001`
 - `gemini-3.1-flash-lite-preview` (up to 500 free requests/day; data may be used by Google in free tier)
 - `gemini-2.5-flash-lite`
-- `deepseek-chat`
+- `deepseek-v4-flash`
 
 ## Get started
 
@@ -41,6 +45,7 @@ More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest 
 
 Open `Edit` -> `Settings` -> `Tag Recommender` and set:
 
+- `Enable AI tag recommendations`: enabled by default; disable if you only want tag autocompletion
 - `API Provider` (`OpenAI`, `Anthropic`, `Google`, or `DeepSeek`; this must match your API key)
 - `Model`
 - `API Key`
@@ -56,10 +61,12 @@ Default prompt behavior is optimized for:
 
 <img src="demo/3_generate_tags.png" width="600">
 
-1. Right-click an item and choose `Suggest Tags with AI`.
-2. Click suggested tags to toggle selection.
-3. You can also type additional tags (comma-separated), e.g. surface chemistry, in-situ, PCET.
-4. Click `Apply Tags` to add the selected tags and the manually typed tags.
+1. Right-click an item and select `Suggest Tags with AI`.
+2. Choose the suggested tags you want to add.
+3. Start typing in the custom tag field to see autocomplete suggestions from your library tags.
+4. Click `Apply Tags` to add all selected tags.
+
+*NB: Autocompletion uses case-insensitive multi-word prefix matching (e.g. typing “gas” or “gde” will match “gas diffusion electrode (GDE)”).*
 
 ## Tips for better results
 
