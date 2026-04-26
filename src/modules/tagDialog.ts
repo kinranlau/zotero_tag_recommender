@@ -3,6 +3,8 @@ import { getString } from "../utils/locale";
 import { TagRecommenderFactory } from "./tagRecommender";
 
 export class TagDialogFactory {
+  private static readonly MAX_AUTOCOMPLETE_SUGGESTIONS = 30;
+
   /**
    * Show tag suggestion dialog for selected items
    */
@@ -75,11 +77,9 @@ export class TagDialogFactory {
         progress: 30,
       });
 
-      // Get existing tags
-      const [existingTags, allLibraryTags] = await Promise.all([
-        TagRecommenderFactory.getExistingTags(),
-        TagRecommenderFactory.getAllLibraryTags(),
-      ]);
+      // Get existing tags (top 100 by usage) and full library tags in one query path
+      const { existingTags, allLibraryTags } =
+        await TagRecommenderFactory.getLibraryTagSets();
 
       progressWin.changeLine({
         text: getString("dialog-calling-api"),
@@ -245,7 +245,7 @@ export class TagDialogFactory {
                 words.some((word) => word.startsWith(queryTerm)),
               );
             })
-            .slice(0, 8);
+            .slice(0, TagDialogFactory.MAX_AUTOCOMPLETE_SUGGESTIONS);
         };
 
         const renderAutocomplete = (matches: string[]) => {
