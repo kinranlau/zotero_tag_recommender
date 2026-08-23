@@ -8,5 +8,5 @@ pref-api-key = API Key:
 pref-prompt-settings = Tag Generation Settings
 pref-max-tags = Maximum Tags:
 pref-custom-prompt = Custom Prompt Template:
-pref-prompt-help = Use {title}, {abstract}, and {tags} as placeholders in your prompt.
+pref-prompt-help = Use {title}, {abstract}, {itemTags}, and {tags} as placeholders in your prompt.
 pref-help = { $name } Build { $version } { $time }
