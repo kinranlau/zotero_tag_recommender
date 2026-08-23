@@ -71,6 +71,7 @@ export class TagDialogFactory {
     try {
       // Get item metadata
       const { title, abstract } = TagRecommenderFactory.getItemMetadata(item);
+      const itemTags = TagRecommenderFactory.getItemTags(item);
 
       progressWin.changeLine({
         text: getString("dialog-fetching-existing-tags"),
@@ -91,6 +92,7 @@ export class TagDialogFactory {
         title,
         abstract,
         existingTags,
+        itemTags,
       );
 
       progressWin.close();

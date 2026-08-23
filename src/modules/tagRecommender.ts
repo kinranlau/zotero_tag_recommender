@@ -87,12 +87,23 @@ export class TagRecommenderFactory {
   }
 
   /**
+   * Get the tags already assigned to an item
+   */
+  static getItemTags(item: Zotero.Item): string[] {
+    return item
+      .getTags()
+      .map(({ tag }) => tag.trim())
+      .filter((tag) => tag.length > 0);
+  }
+
+  /**
    * Call LLM API to get tag suggestions
    */
   static async getSuggestedTags(
     title: string,
     abstract: string,
     existingTags: string[],
+    itemTags: string[],
   ): Promise<string[]> {
     const apiKey = Zotero.Prefs.get(
       `${config.prefsPrefix}.apiKey`,
@@ -126,13 +137,19 @@ export class TagRecommenderFactory {
 
     // Build the prompt
     const tagsString = existingTags.join(", ");
-    const prompt = customPrompt
+    const itemTagsString = itemTags.join(", ");
+    let prompt = customPrompt
       .replace("{title}", title)
       .replace("{abstract}", abstract || "No abstract available")
+      .replace("{itemTags}", itemTagsString || "No tags currently on this item")
       .replace("{tags}", tagsString || "No existing tags");
+    if (!customPrompt.includes("{itemTags}")) {
+      prompt += `\n\nCurrent item tags: ${itemTagsString || "No tags currently on this item"}\nDo not suggest any tag already on this item.`;
+    }
 
     ztoolkit.log("Generated prompt:", prompt.substring(0, 200) + "...");
     ztoolkit.log("Top library tags count sent:", existingTags.length);
+    ztoolkit.log("Current item tags count sent:", itemTags.length);
 
     let suggestions: string[] = [];
 
@@ -165,7 +182,10 @@ export class TagRecommenderFactory {
       throw error;
     }
 
-    return suggestions;
+    const itemTagKeys = new Set(itemTags.map((tag) => tag.toLocaleLowerCase()));
+    return suggestions.filter(
+      (tag) => !itemTagKeys.has(tag.toLocaleLowerCase()),
+    );
   }
 
   /**
@@ -196,8 +216,16 @@ export class TagRecommenderFactory {
         },
       ],
     };
-    requestBody.temperature = 0.7;
-    requestBody.max_tokens = 150;
+    if (resolvedModel.startsWith("gpt-5.6")) {
+      // GPT-5.6 defaults to medium reasoning, and reasoning tokens count toward
+      // max_completion_tokens. Tag generation is simple enough to skip hidden
+      // reasoning and reserve the entire budget for the visible response.
+      requestBody.reasoning_effort = "none";
+      requestBody.max_completion_tokens = 300;
+    } else {
+      requestBody.temperature = 0.7;
+      requestBody.max_tokens = 150;
+    }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -216,7 +244,14 @@ export class TagRecommenderFactory {
 
     const data = await response.json();
     ztoolkit.log("OpenAI API response:", data);
-    const content = (data as any).choices?.[0]?.message?.content || "";
+    const choice = (data as any).choices?.[0];
+    const content = choice?.message?.content || "";
+    if (!content.trim()) {
+      const finishReason = choice?.finish_reason || "unknown";
+      throw new Error(
+        `OpenAI returned no tag suggestions (finish reason: ${finishReason}).`,
+      );
+    }
     return this.parseTags(content, maxTags);
   }
 

@@ -8,5 +8,5 @@ pref-api-key = API 密钥:
 pref-prompt-settings = 标签生成设置
 pref-max-tags = 最大标签数:
 pref-custom-prompt = 自定义提示模板:
-pref-prompt-help = 在提示中使用 {title}, {abstract}, 和 {tags} 作为占位符。
+pref-prompt-help = 在提示中使用 {title}、{abstract}、{itemTags} 和 {tags} 作为占位符。
 pref-help = { $name } Build { $version } { $time }
