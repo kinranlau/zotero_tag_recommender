@@ -26,7 +26,7 @@ More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest 
 - `gpt-4o-mini`
 - `claude-haiku-4-5-20251001`
 - `gemini-3.5-flash-lite` (up to 500 free requests/day; data may be used by Google in free tier)
-- `gemini-3.1-flash-lite` 
+- `gemini-3.1-flash-lite`
 - `deepseek-v4-flash`
 
 ## Get started
