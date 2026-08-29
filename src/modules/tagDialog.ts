@@ -4,11 +4,22 @@ import { TagRecommenderFactory } from "./tagRecommender";
 
 export class TagDialogFactory {
   private static readonly MAX_AUTOCOMPLETE_SUGGESTIONS = 30;
+  private static dialogActive = false;
 
   /**
    * Show tag suggestion dialog for selected items
    */
   static async showTagDialog(): Promise<void> {
+    if (this.dialogActive) return;
+    this.dialogActive = true;
+    try {
+      await this.showTagDialogInternal();
+    } finally {
+      this.dialogActive = false;
+    }
+  }
+
+  private static async showTagDialogInternal(): Promise<void> {
     const win = Zotero.getMainWindow();
     if (!win || !win.ZoteroPane) {
       return;

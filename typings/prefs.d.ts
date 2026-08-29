@@ -9,6 +9,8 @@ declare namespace _ZoteroTypes {
     PluginPrefsMap: {
       "apiKey": string;
       "enableAISuggestions": boolean;
+      "hotkeyEnabled": boolean;
+      "hotkey": string;
       "apiProvider": string;
       "apiModel": string;
       "customPrompt": string;

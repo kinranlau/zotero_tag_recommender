@@ -46,6 +46,7 @@ More details in my Medium article: [Zotero Tag Recommender: Using AI to Suggest 
 Open `Edit` -> `Settings` -> `Tag Recommender` and set:
 
 - `Enable AI tag recommendations`: enabled by default; disable if you only want tag autocompletion
+- `Enable keyboard shortcut`: disabled by default; the default shortcut is `Ctrl+T` on Windows/Linux or `Cmd+T` on macOS
 - `API Provider` (`OpenAI`, `Anthropic`, `Google`, or `DeepSeek`; this must match your API key)
 - `Model`
 - `API Key`
@@ -61,7 +62,7 @@ Default prompt behavior is optimized for:
 
 <img src="demo/3_generate_tags.png" width="600">
 
-1. Right-click an item and select `Suggest Tags with AI`.
+1. Right-click an item and select `Suggest Tags with AI`, or use your enabled keyboard shortcut.
 2. Choose the suggested tags you want to add.
 3. Start typing in the custom tag field to see autocomplete suggestions from your library tags.
 4. Click `Apply Tags` to add all selected tags.
