@@ -62,7 +62,7 @@ Default prompt behavior is optimized for:
 
 <img src="demo/3_generate_tags.png" width="600">
 
-1. Right-click an item and select `Suggest Tags with AI`, or use your enabled keyboard shortcut.
+1. Right-click an item and select `Suggest Tags with AI` (or use your enabled keyboard shortcut).
 2. Choose the suggested tags you want to add.
 3. Start typing in the custom tag field to see autocomplete suggestions from your library tags.
 4. Click `Apply Tags` to add all selected tags.
