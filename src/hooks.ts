@@ -2,6 +2,7 @@ import { BasicExampleFactory, UIExampleFactory } from "./modules/examples";
 import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
+import { HotkeyFactory } from "./modules/hotkey";
 
 async function onStartup() {
   await Promise.all([
@@ -29,16 +30,19 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   );
 
   UIExampleFactory.registerRightClickMenuItem();
+  HotkeyFactory.register(win);
 
   addon.data.initialized = true;
 }
 
 async function onMainWindowUnload(win: Window): Promise<void> {
+  HotkeyFactory.unregister(win);
   ztoolkit.unregisterAll();
   addon.data.dialog?.window?.close();
 }
 
 function onShutdown(): void {
+  HotkeyFactory.unregisterAll();
   ztoolkit.unregisterAll();
   addon.data.dialog?.window?.close();
   // Remove addon object

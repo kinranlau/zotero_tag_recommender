@@ -12,6 +12,37 @@
     data-l10n-id="pref-enable-ai-suggestions"
   />
 
+  <checkbox
+    id="zotero-prefpane-__addonRef__-hotkeyEnabled"
+    preference="hotkeyEnabled"
+    data-l10n-id="pref-enable-hotkey"
+  />
+  <hbox align="center" style="gap: 6px; margin-inline-start: 20px">
+    <html:label
+      for="zotero-prefpane-__addonRef__-hotkey"
+      data-l10n-id="pref-hotkey"
+    ></html:label>
+    <html:input
+      id="zotero-prefpane-__addonRef__-hotkey"
+      type="text"
+      readonly="readonly"
+      size="18"
+      data-l10n-id="pref-hotkey-placeholder"
+    ></html:input>
+    <button
+      id="zotero-prefpane-__addonRef__-hotkeySuggested"
+      data-l10n-id="pref-hotkey-use-suggested"
+    />
+    <button
+      id="zotero-prefpane-__addonRef__-hotkeyClear"
+      data-l10n-id="pref-hotkey-clear"
+    />
+  </hbox>
+  <html:div
+    id="zotero-prefpane-__addonRef__-hotkeyStatus"
+    style="font-size: 0.9em; color: #666; margin-inline-start: 20px"
+  ></html:div>
+
   <label><html:h3 data-l10n-id="pref-api-settings"></html:h3></label>
 
   <hbox align="center">

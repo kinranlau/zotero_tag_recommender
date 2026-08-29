@@ -1,5 +1,7 @@
 pref("apiKey", "");
 pref("enableAISuggestions", true);
+pref("hotkeyEnabled", false);
+pref("hotkey", "accel,t");
 pref("apiProvider", "openai");
 pref("apiModel", "gpt-4o-mini");
 pref(
